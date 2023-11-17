@@ -37,9 +37,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "core",
     "users",
     "rest_framework",
+    "rest_framework.authtoken",
     "drf_spectacular",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -144,6 +144,9 @@ AUTH_USER_MODEL = "users.CustomUser"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
 }
 
 SPECTACULAR_SETTINGS = {
