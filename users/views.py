@@ -12,6 +12,21 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+
+        serializer = AuthTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        token, created = Token.objects.get_or_create(user=user)
+
+        return Response(
+            {
+                "token": token.key,
+                "user": UserSerializer(user).data,
+            }
+        )
+
 
 class LoginView(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
@@ -27,6 +42,7 @@ class LoginView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
+
         return Response(
             {
                 "token": token.key,

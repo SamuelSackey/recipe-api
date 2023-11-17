@@ -7,9 +7,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ["email", "password", "name"]
-
-    # this tells the view that the we can "post" the password but not "get" it
-    extra_kwargs = {"password": {"write_only": True, "min_length": 8}}
+        # this tells the view that the we can "post" the password but not "get" it
+        extra_kwargs = {
+            "password": {"write_only": True, "min_length": 8, "required": False}
+        }
 
     # this is used by the create api view to create new users
     def create(self, validated_data):
