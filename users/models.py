@@ -20,13 +20,16 @@ class CustomUserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, password=None):
-        user = self.create_user(email, password=password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
 
-        return user
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError(_("Superuser must have is_staff=True."))
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError(_("Superuser must have is_superuser=True."))
+        return self.create_user(email, password, **extra_fields)
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -36,7 +39,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         unique=True,
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -46,6 +49,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # set to use the email for authentication
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = "user"
+        verbose_name_plural = "users"
 
     def __str__(self):
         return self.email
